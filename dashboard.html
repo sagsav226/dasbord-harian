@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Laporan Harian Operasional — BSI Pro</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+    :root{
+      --blue:#123A6B;
+      --blue-700:#0E2E55;
+      --blue-50:#EAF1FB;
+      --gold:#C9A227;
+      --gold-soft:#F6EFD8;
+      --red:#B5322B;
+      --red-soft:#FBEAE8;
+      --green:#1E7A52;
+      --green-soft:#E3F3EB;
+      --amber:#B97309;
+      --amber-soft:#FBF0DC;
+      --ink:#1A2230;
+      --muted:#69748A;
+      --line:#E3E8F0;
+      --bg:#F4F6FA;
+      --card:#FFFFFF;
+      --shadow:0 1px 2px rgba(18,58,107,.05), 0 8px 24px rgba(18,58,107,.06);
+    }
+
+    *{box-sizing:border-box;}
+    body{margin:0;}
+    .app{
+      font-family:'Plus Jakarta Sans',sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 400px at 100% -10%, rgba(201,162,39,.07), transparent 60%),
+        radial-gradient(900px 380px at -10% 0%, rgba(18,58,107,.06), transparent 55%),
+        var(--bg);
+      min-height:100vh;
+      padding:22px clamp(14px,3vw,34px) 60px;
+    }
+    h1,h2,h3,.font-display{font-family:'Sora',sans-serif;}
+
+    /* ---------- HEADER ---------- */
+    .topbar{
+      display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+      background:linear-gradient(120deg,var(--blue) 0%,var(--blue-700) 70%);
+      color:#fff;border-radius:18px;padding:18px 22px;
+      box-shadow:var(--shadow);position:relative;overflow:hidden;
+    }
+    .topbar::after{content:"";position:absolute;right:-40px;top:-60px;width:220px;height:220px;
+      background:radial-gradient(circle,rgba(201,162,39,.35),transparent 65%);}
+    .logo{
+      width:54px;height:54px;border-radius:14px;flex:0 0 auto;
+      background:linear-gradient(135deg,var(--gold),#9c7c12);
+      display:grid;place-items:center;font-family:'Sora';font-weight:800;font-size:20px;color:#1a1303;
+      box-shadow:inset 0 0 0 2px rgba(255,255,255,.25);
+    }
+    .brand h1{margin:0;font-size:clamp(18px,2.4vw,23px);font-weight:800;letter-spacing:.2px;line-height:1.15;}
+    .brand .tag{margin-top:3px;font-size:11px;letter-spacing:2.5px;font-weight:600;color:var(--gold-soft);text-transform:uppercase;}
+    .header-meta{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+    .field-light{display:flex;flex-direction:column;gap:4px;}
+    .field-light label{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,.7);font-weight:600;}
+    .field-light input{
+      background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;
+      border-radius:10px;padding:8px 11px;font-family:inherit;font-size:13.5px;min-width:150px;
+    }
+    .field-light input::placeholder{color:rgba(255,255,255,.55);}
+    .field-light input:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,.2);}
+
+    .actions{display:flex;gap:8px;margin-left:8px;}
+    .btn{font-family:'Sora';font-weight:600;font-size:12.5px;border:none;cursor:pointer;border-radius:10px;
+      padding:9px 13px;display:inline-flex;align-items:center;gap:6px;transition:.15s;}
+    .btn-gold{background:var(--gold);color:#1a1303;}
+    .btn-gold:hover{filter:brightness(1.06);}
+    .btn-ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);}
+    .btn-ghost:hover{background:rgba(255,255,255,.24);}
+
+    /* ---------- KPI ---------- */
+    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin:18px 0;}
+    .kpi{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:14px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+    .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blue);}
+    .kpi.k-gold::before{background:var(--gold);}.kpi.k-red::before{background:var(--red);}
+    .kpi.k-green::before{background:var(--green);}.kpi.k-amber::before{background:var(--amber);}
+    .kpi .lbl{font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);font-weight:600;}
+    .kpi .val{font-family:'Sora';font-weight:800;font-size:28px;line-height:1;margin-top:7px;}
+    .kpi .sub{font-size:11.5px;color:var(--muted);margin-top:5px;}
+
+    /* ---------- TABS ---------- */
+    .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+    .tab{font-family:'Sora';font-weight:600;font-size:13px;border:1px solid var(--line);background:#fff;color:var(--muted);
+      padding:9px 14px;border-radius:11px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:7px;}
+    .tab .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);}
+    .tab:hover{border-color:var(--blue);color:var(--blue);}
+    .tab.active{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:var(--shadow);}
+    .tab.active .dot{background:var(--gold);}
+    .tab .count{background:var(--blue-50);color:var(--blue);font-size:11px;border-radius:20px;padding:1px 7px;font-weight:700;}
+    .tab.active .count{background:rgba(255,255,255,.2);color:#fff;}
+
+    /* ---------- PANEL ---------- */
+    .panel{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;display:none;}
+    .panel.active{display:block;animation:fade .25s ease;}
+    @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    .panel-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;
+      background:linear-gradient(180deg,#fbfcfe,#fff);}
+    .panel-head .ic{width:38px;height:38px;border-radius:11px;background:var(--blue-50);color:var(--blue);
+      display:grid;place-items:center;font-size:19px;flex:0 0 auto;}
+    .panel-head h2{margin:0;font-size:16px;font-weight:700;}
+    .panel-head p{margin:2px 0 0;font-size:12.5px;color:var(--muted);}
+
+    .form-grid{display:grid;gap:11px;padding:18px 20px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));align-items:end;}
+    .fld{display:flex;flex-direction:column;gap:5px;}
+    .fld label{font-size:11px;font-weight:600;letter-spacing:.4px;color:var(--muted);text-transform:uppercase;}
+    .fld input,.fld select,.fld textarea{
+      border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-family:inherit;font-size:13.5px;color:var(--ink);background:#fff;width:100%;}
+    .fld textarea{resize:vertical;min-height:38px;}
+    .fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-50);}
+    .fld.wide{grid-column:1/-1;}
+    .add-row{grid-column:1/-1;display:flex;justify-content:flex-end;}
+    .btn-add{background:var(--blue);color:#fff;font-family:'Sora';font-weight:600;font-size:13px;border:none;border-radius:10px;padding:10px 18px;cursor:pointer;transition:.15s;}
+    .btn-add:hover{background:var(--blue-700);}
+
+    .table-wrap{overflow-x:auto;padding:0 8px 12px;}
+    table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px;}
+    thead th{text-align:left;font-family:'Sora';font-weight:600;font-size:11px;letter-spacing:.7px;text-transform:uppercase;
+      color:var(--muted);padding:10px 12px;border-bottom:2px solid var(--line);white-space:nowrap;}
+    tbody td{padding:11px 12px;border-bottom:1px solid #EEF1F6;vertical-align:top;}
+    tbody tr:hover{background:#FAFBFD;}
+    tbody td.num{font-variant-numeric:tabular-nums;font-weight:600;}
+    .empty{padding:30px;text-align:center;color:var(--muted);font-size:13.5px;}
+
+    .pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;font-family:'Sora';white-space:nowrap;}
+    .p-green{background:var(--green-soft);color:var(--green);}
+    .p-amber{background:var(--amber-soft);color:var(--amber);}
+    .p-red{background:var(--red-soft);color:var(--red);}
+    .p-blue{background:var(--blue-50);color:var(--blue);}
+    .p-gray{background:#EEF1F6;color:var(--muted);}
+
+    .del{border:none;background:var(--red-soft);color:var(--red);width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:14px;line-height:1;transition:.15s;}
+    .del:hover{background:var(--red);color:#fff;}
+
+    .foot{margin-top:18px;text-align:center;color:var(--muted);font-size:11.5px;}
+    .foot b{color:var(--blue);}
+
+    @media print{
+      .app{background:#fff;padding:0;}
+      .tabs,.form-grid,.actions,.del,.header-meta .btn,.foot{display:none!important;}
+      .panel{display:block!important;page-break-inside:avoid;border:1px solid #ccc;margin-bottom:14px;box-shadow:none;}
+      .topbar{background:var(--blue)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- HEADER -->
+  <div class="topbar">
+    <div class="logo">BSI</div>
+    <div class="brand">
+      <h1>Dashboard Laporan Harian Operasional</h1>
+      <div class="tag">Facility Service Excellence</div>
+    </div>
+    <div class="header-meta">
+      <div class="field-light">
+        <label>Tanggal Laporan</label>
+        <input type="date" id="tgl">
+      </div>
+      <div class="field-light">
+        <label>Admin / PIC</label>
+        <input type="text" id="admin" placeholder="Nama administrasi">
+      </div>
+      <div class="field-light">
+        <label>Area / Proyek</label>
+        <input type="text" id="area" placeholder="Nama site / proyek">
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost" id="btnCetak">🖨 Cetak / PDF</button>
+        <button class="btn btn-gold" id="btnCsv">⬇ Export CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI -->
+  <div class="kpis" id="kpis"></div>
+
+  <!-- TABS -->
+  <div class="tabs" id="tabs"></div>
+
+  <!-- PANELS -->
+  <div id="panels"></div>
+
+  <div class="foot">
+    Data tersimpan otomatis per tanggal di perangkat ini · <b>PT. Bangun Sinar Indonesia</b> — BSI Pro
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- STORAGE (localStorage fallback) ---------- */
+  const storage = {
+    get: function(key){
+      try{ const v = localStorage.getItem(key); return v ? {value: v} : null; }
+      catch(e){ return null; }
+    },
+    set: function(key, value){
+      try{ localStorage.setItem(key, value); } catch(e){ console.error(e); }
+    }
+  };
+
+  /* ---------- DEFINISI MODUL ---------- */
+  const MODULES = [
+    { key:'operasional', icon:'📋', label:'Kegiatan Operasional',
+      desc:'Catatan aktivitas operasional rutin harian',
+      fields:[
+        {n:'waktu', l:'Waktu', t:'time', w:'s'},
+        {n:'kegiatan', l:'Kegiatan', t:'text', w:'l', ph:'Uraian kegiatan'},
+        {n:'lokasi', l:'Lokasi', t:'text', w:'m'},
+        {n:'pic', l:'PIC', t:'text', w:'s'},
+        {n:'status', l:'Status', t:'select', opt:['Selesai','Proses','Tertunda']},
+        {n:'ket', l:'Keterangan', t:'text', w:'l'},
+      ]},
+    { key:'kunjungan', icon:'📍', label:'Kunjungan Area',
+      desc:'Hasil kunjungan & inspeksi area/site',
+      fields:[
+        {n:'waktu', l:'Waktu', t:'time', w:'s'},
+        {n:'lokasi', l:'Lokasi / Area', t:'text', w:'m'},
+        {n:'pic', l:'Petugas', t:'text', w:'s'},
+        {n:'temuan', l:'Temuan / Catatan', t:'text', w:'l'},
+        {n:'tindakan', l:'Tindak Lanjut', t:'text', w:'l'},
+        {n:'status', l:'Kondisi', t:'select', opt:['Baik','Perlu Perbaikan','Kritis']},
+      ]},
+    { key:'mesin', icon:'🔧', label:'Perbaikan Mesin',
+      desc:'Pemeliharaan & perbaikan peralatan/mesin',
+      fields:[
+        {n:'mesin', l:'Mesin / Alat', t:'text', w:'m'},
+        {n:'lokasi', l:'Lokasi', t:'text', w:'s'},
+        {n:'kerusakan', l:'Jenis Kerusakan', t:'text', w:'l'},
+        {n:'tindakan', l:'Tindakan', t:'text', w:'l'},
+        {n:'teknisi', l:'Teknisi', t:'text', w:'s'},
+        {n:'status', l:'Status', t:'select', opt:['Selesai','Proses','Menunggu Sparepart','Pending']},
+      ]},
+    { key:'inventaris', icon:'📦', label:'Inventaris',
+      desc:'Mutasi stok barang & material',
+      fields:[
+        {n:'item', l:'Nama Item', t:'text', w:'m'},
+        {n:'kategori', l:'Kategori', t:'select', opt:['Chemical','Consumable','Alat','Spare Part','APD','Lainnya']},
+        {n:'masuk', l:'Masuk', t:'number', w:'s'},
+        {n:'keluar', l:'Keluar', t:'number', w:'s'},
+        {n:'sisa', l:'Sisa Stok', t:'number', w:'s'},
+        {n:'satuan', l:'Satuan', t:'text', w:'s', ph:'pcs/ltr/box'},
+      ]},
+    { key:'absensi', icon:'🕒', label:'Rekap Absensi',
+      desc:'Kehadiran personil harian',
+      fields:[
+        {n:'nama', l:'Nama', t:'text', w:'m'},
+        {n:'jabatan', l:'Jabatan / Posisi', t:'text', w:'m'},
+        {n:'masuk', l:'Jam Masuk', t:'time', w:'s'},
+        {n:'pulang', l:'Jam Pulang', t:'time', w:'s'},
+        {n:'status', l:'Status', t:'select', opt:['Hadir','Terlambat','Izin','Sakit','Cuti','Alpha']},
+        {n:'ket', l:'Keterangan', t:'text', w:'m'},
+      ]},
+    { key:'komplain', icon:'⚠️', label:'Komplain',
+      desc:'Keluhan klien / pengguna area',
+      fields:[
+        {n:'waktu', l:'Waktu', t:'time', w:'s'},
+        {n:'pelapor', l:'Pelapor / Area', t:'text', w:'m'},
+        {n:'kategori', l:'Kategori', t:'select', opt:['Kebersihan','Maintenance','SDM','Keamanan','Lainnya']},
+        {n:'deskripsi', l:'Deskripsi Komplain', t:'text', w:'l'},
+        {n:'penanganan', l:'Penanganan', t:'text', w:'l'},
+        {n:'status', l:'Status', t:'select', opt:['Open','Proses','Closed']},
+      ]},
+    { key:'nonreguler', icon:'✨', label:'Kegiatan Non Reguler',
+      desc:'Aktivitas insidental / di luar jadwal rutin',
+      fields:[
+        {n:'waktu', l:'Waktu', t:'time', w:'s'},
+        {n:'kegiatan', l:'Kegiatan', t:'text', w:'l'},
+        {n:'lokasi', l:'Lokasi', t:'text', w:'m'},
+        {n:'pic', l:'PIC', t:'text', w:'s'},
+        {n:'ket', l:'Keterangan', t:'text', w:'l'},
+      ]},
+    { key:'rencana', icon:'🎯', label:'Rencana Kerja',
+      desc:'Rencana tindak lanjut & target ke depan',
+      fields:[
+        {n:'target', l:'Tgl Target', t:'date', w:'s'},
+        {n:'kegiatan', l:'Rencana Kegiatan', t:'text', w:'l'},
+        {n:'pic', l:'PIC', t:'text', w:'s'},
+        {n:'prioritas', l:'Prioritas', t:'select', opt:['Tinggi','Sedang','Rendah']},
+        {n:'status', l:'Status', t:'select', opt:['Belum Mulai','Berjalan','Selesai']},
+        {n:'ket', l:'Keterangan', t:'text', w:'l'},
+      ]},
+  ];
+
+  const PILL = {
+    'Selesai':'p-green','Closed':'p-green','Baik':'p-green','Hadir':'p-green','Berjalan':'p-blue',
+    'Proses':'p-amber','Terlambat':'p-amber','Perlu Perbaikan':'p-amber','Menunggu Sparepart':'p-amber','Open':'p-amber','Belum Mulai':'p-gray',
+    'Tertunda':'p-red','Pending':'p-red','Kritis':'p-red','Alpha':'p-red','Tinggi':'p-red',
+    'Izin':'p-blue','Cuti':'p-blue','Sakit':'p-amber','Sedang':'p-amber','Rendah':'p-gray','Lainnya':'p-gray',
+  };
+
+  /* ---------- STATE ---------- */
+  let DATA = {};
+  let META = {admin:'', area:''};
+  let activeTab = MODULES[0].key;
+  let currentDate = new Date().toISOString().slice(0,10);
+
+  const el = id => document.getElementById(id);
+  const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  /* ---------- STORAGE ---------- */
+  const keyFor = d => 'laporan:'+d;
+  function loadDay(d){
+    DATA = {}; META = {admin:'',area:''};
+    try{
+      const r = storage.get(keyFor(d));
+      if(r && r.value){ const o=JSON.parse(r.value); DATA=o.data||{}; META=o.meta||{admin:'',area:''}; }
+    }catch(e){}
+    MODULES.forEach(m=>{ if(!Array.isArray(DATA[m.key])) DATA[m.key]=[]; });
+  }
+  function saveDay(){
+    try{
+      storage.set(keyFor(currentDate), JSON.stringify({data:DATA, meta:META}));
+    }catch(e){ console.error('Gagal simpan', e); }
+  }
+
+  /* ---------- RENDER ---------- */
+  function buildTabs(){
+    el('tabs').innerHTML = MODULES.map(m=>{
+      const n=(DATA[m.key]||[]).length;
+      return `<button class="tab ${m.key===activeTab?'active':''}" data-tab="${m.key}">
+        <span class="dot"></span>${m.icon} ${m.label}
+        <span class="count">${n}</span></button>`;
+    }).join('');
+    el('tabs').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{activeTab=b.dataset.tab;render();});
+  }
+
+  function fieldHtml(m,f){
+    const id=`f_${m.key}_${f.n}`;
+    const cls = f.w==='l'?'fld wide':'fld';
+    let inner;
+    if(f.t==='select'){
+      inner=`<select id="${id}">${f.opt.map(o=>`<option>${o}</option>`).join('')}</select>`;
+    }else if(f.t==='textarea'){
+      inner=`<textarea id="${id}" placeholder="${f.ph||''}"></textarea>`;
+    }else{
+      inner=`<input id="${id}" type="${f.t}" placeholder="${f.ph||''}">`;
+    }
+    return `<div class="${cls}"><label>${f.l}</label>${inner}</div>`;
+  }
+
+  function rowsHtml(m){
+    const rows=DATA[m.key]||[];
+    if(!rows.length) return `<div class="empty">Belum ada data ${m.label.toLowerCase()} untuk tanggal ini.</div>`;
+    const head = m.fields.map(f=>`<th>${f.l}</th>`).join('')+'<th></th>';
+    const body = rows.map((r,i)=>{
+      const tds = m.fields.map(f=>{
+        let v=r[f.n]??'';
+        if((f.n==='status'||f.n==='prioritas')&&v){
+          return `<td><span class="pill ${PILL[v]||'p-gray'}">${esc(v)}</span></td>`;
+        }
+        if(f.t==='number') return `<td class="num">${esc(v)}</td>`;
+        return `<td>${esc(v)}</td>`;
+      }).join('');
+      return `<tr>${tds}<td><button class="del" data-mod="${m.key}" data-i="${i}" title="Hapus">✕</button></td></tr>`;
+    }).join('');
+    return `<div class="table-wrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+  }
+
+  function buildPanels(){
+    el('panels').innerHTML = MODULES.map(m=>`
+      <div class="panel ${m.key===activeTab?'active':''}" data-panel="${m.key}">
+        <div class="panel-head">
+          <div class="ic">${m.icon}</div>
+          <div><h2>${m.label}</h2><p>${m.desc}</p></div>
+        </div>
+        <div class="form-grid">
+          ${m.fields.map(f=>fieldHtml(m,f)).join('')}
+          <div class="add-row"><button class="btn-add" data-add="${m.key}">+ Tambah Baris</button></div>
+        </div>
+        ${rowsHtml(m)}
+      </div>`).join('');
+
+    el('panels').querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>addRow(b.dataset.add));
+    el('panels').querySelectorAll('.del').forEach(b=>b.onclick=()=>delRow(b.dataset.mod, +b.dataset.i));
+  }
+
+  function addRow(key){
+    const m=MODULES.find(x=>x.key===key);
+    const row={};
+    let filled=false;
+    m.fields.forEach(f=>{
+      const v=el(`f_${key}_${f.n}`).value.trim();
+      row[f.n]=v; if(v) filled=true;
+    });
+    if(!filled){ alert('Isi minimal satu kolom sebelum menambah baris.'); return; }
+    DATA[key].push(row);
+    saveDay(); render();
+  }
+  function delRow(key,i){ DATA[key].splice(i,1); saveDay(); render(); }
+
+  /* ---------- KPI ---------- */
+  function kpiHtml(){
+    const cnt = k=>(DATA[k]||[]);
+    const abs=cnt('absensi');
+    const hadir=abs.filter(r=>['Hadir','Terlambat'].includes(r.status)).length;
+    const persen= abs.length? Math.round(hadir/abs.length*100):0;
+    const komplainOpen=cnt('komplain').filter(r=>r.status!=='Closed').length;
+    const mesinDone=cnt('mesin').filter(r=>r.status==='Selesai').length;
+    const k=[
+      {l:'Kunjungan Area', v:cnt('kunjungan').length, s:'inspeksi hari ini', c:''},
+      {l:'Perbaikan Mesin', v:cnt('mesin').length, s:`${mesinDone} selesai`, c:'k-gold'},
+      {l:'Komplain Terbuka', v:komplainOpen, s:`dari ${cnt('komplain').length} total`, c:'k-red'},
+      {l:'Kehadiran', v:persen+'%', s:`${hadir}/${abs.length} personil`, c:'k-green'},
+      {l:'Rencana Kerja', v:cnt('rencana').length, s:'tindak lanjut', c:'k-amber'},
+    ];
+    return k.map(x=>`<div class="kpi ${x.c}"><div class="lbl">${x.l}</div><div class="val">${x.v}</div><div class="sub">${x.s}</div></div>`).join('');
+  }
+
+  function render(){ el('kpis').innerHTML=kpiHtml(); buildTabs(); buildPanels(); }
+
+  /* ---------- EXPORT CSV ---------- */
+  function exportCsv(){
+    let out=[];
+    out.push(`Laporan Harian Operasional;Tanggal:;${currentDate}`);
+    out.push(`Admin:;${META.admin};Area:;${META.area}`);
+    out.push('');
+    MODULES.forEach(m=>{
+      const rows=DATA[m.key]||[];
+      if(!rows.length) return;
+      out.push(m.label.toUpperCase());
+      out.push(m.fields.map(f=>f.l).join(';'));
+      rows.forEach(r=>out.push(m.fields.map(f=>`"${String(r[f.n]??'').replace(/"/g,'""')}"`).join(';')));
+      out.push('');
+    });
+    const blob=new Blob(['﻿'+out.join('\n')],{type:'text/csv;charset=utf-8;'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`Laporan_Harian_${currentDate}.csv`;
+    a.click();
+  }
+
+  /* ---------- INIT ---------- */
+  function init(){
+    el('tgl').value=currentDate;
+    loadDay(currentDate);
+    el('admin').value=META.admin||'';
+    el('area').value=META.area||'';
+    render();
+
+    el('tgl').onchange=e=>{ currentDate=e.target.value; loadDay(currentDate);
+      el('admin').value=META.admin||''; el('area').value=META.area||''; render(); };
+    el('admin').oninput=e=>{ META.admin=e.target.value; saveDay(); };
+    el('area').oninput=e=>{ META.area=e.target.value; saveDay(); };
+    el('btnCetak').onclick=()=>window.print();
+    el('btnCsv').onclick=exportCsv;
+  }
+  init();
+})();
+</script>
+</body>
+</html>
